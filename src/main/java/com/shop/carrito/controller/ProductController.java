@@ -1,7 +1,10 @@
 package com.shop.carrito.controller;
 
+import com.shop.carrito.dto.CreateProductRequest;
 import com.shop.carrito.dto.ProductDto;
 import com.shop.carrito.service.ProductService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,5 +27,11 @@ public class ProductController {
     @GetMapping("/{id}")
     public ProductDto getById(@PathVariable Long id) {
         return productService.getById(id);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductDto create(@Valid @RequestBody CreateProductRequest request) {
+        return productService.create(request);
     }
 }
