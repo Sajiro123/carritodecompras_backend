@@ -1,7 +1,5 @@
 package com.shop.carrito.service;
 
-import com.shop.carrito.dto.CreateProductRequest;
-import com.shop.carrito.dto.ProductDto;
 import com.shop.carrito.dto.*;
 import com.shop.carrito.entity.Product;
 import com.shop.carrito.repository.AttributeValueRepository;
@@ -18,7 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.text.Normalizer;
 import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
 @Service
 public class ProductService {
@@ -95,19 +96,116 @@ public class ProductService {
         return ProductDto.from(product);
     }
 
+    @Transactional(readOnly = true)
+    public ProductDetailDto getBySlug(String slug) {
+        Product product;
+        if (slug.matches("\\d+")) {
+            Long id = Long.parseLong(slug);
+            product = productRepository.findByIdAndActiveTrue(id)
+                    .or(() -> productRepository.findBySlugAndActiveTrue(slug))
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado"));
+        } else {
+            product = productRepository.findBySlugAndActiveTrue(slug)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado"));
+        }
+
+        // Galería (producto_imagen)
+        var galeria = (product.getImages() != null ? product.getImages() : List.<com.shop.carrito.entity.ProductImage>of())
+                .stream()
+                .map(ProductImageDto::from)
+                .toList();
+
+        // Variantes con stock y atributos (producto_variante + atributo_valor)
+        var variantes = (product.getVariants() != null ? product.getVariants() : List.<com.shop.carrito.entity.ProductVariant>of())
+                .stream()
+                .map(ProductVariantDto::from)
+                .toList();
+
+        // Productos relacionados (de la misma categoría o catálogo general)
+        List<ProductDto> relacionados = List.of();
+        if (product.getCategory() != null) {
+            relacionados = productRepository.findTop4ByCategoryAndActiveTrueAndIdNot(product.getCategory(), product.getId())
+                    .stream()
+                    .map(ProductDto::from)
+                    .toList();
+        }
+        if (relacionados.isEmpty()) {
+            relacionados = productRepository.findTop4ByActiveTrueAndIdNot(product.getId())
+                    .stream()
+                    .map(ProductDto::from)
+                    .toList();
+        }
+
+        Long catId = product.getCategory() != null ? product.getCategory().getId() : null;
+        String catName = product.getCategory() != null ? product.getCategory().getName() : null;
+        String catSlug = product.getCategory() != null ? product.getCategory().getSlug() : null;
+
+        return new ProductDetailDto(
+                product.getId(),
+                product.getName(),
+                product.getSlug(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getStock(),
+                product.getImageUrl(),
+                catId,
+                catName,
+                catSlug,
+                galeria,
+                variantes,
+                relacionados
+        );
+    }
+
     /** Crea y activa un producto nuevo en el catálogo. */
     @Transactional
     public ProductDto create(CreateProductRequest request) {
+        String cleanName = request.name().trim();
         String cleanDescription = request.description() != null && !request.description().isBlank()
                 ? request.description().trim()
                 : null;
         var product = new Product(
-                request.name().trim(),
+                cleanName,
+                buildUniqueSlug(cleanName),
                 cleanDescription,
                 request.price(),
                 request.stock(),
-                request.imageUrl().trim()
+                request.imageUrl().trim(),
+                null
         );
         return ProductDto.from(productRepository.save(product));
+    }
+
+    private String buildUniqueSlug(String name) {
+        String base = Normalizer.normalize(name, Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .toLowerCase(Locale.ROOT)
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("^-+|-+$", "");
+        if (base.isBlank()) {
+            base = "producto";
+        }
+        if (base.length() > 130) {
+            base = base.substring(0, 130);
+        }
+        if (productRepository.findBySlugAndActiveTrue(base).isEmpty()) {
+            return base;
+        }
+        return base + "-" + UUID.randomUUID().toString().substring(0, 6);
+    }
+
+    private Sort parseSort(String sort) {
+        if (sort == null || sort.isBlank()) {
+            return Sort.by(Sort.Direction.ASC, "id");
+        }
+        String s = sort.trim().toLowerCase();
+        return switch (s) {
+            case "price,asc", "precio_asc", "price-asc", "asc" -> Sort.by(Sort.Direction.ASC, "price");
+            case "price,desc", "precio_desc", "price-desc", "desc" -> Sort.by(Sort.Direction.DESC, "price");
+            case "name,asc", "nombre_asc", "name-asc" -> Sort.by(Sort.Direction.ASC, "name");
+            case "name,desc", "nombre_desc", "name-desc" -> Sort.by(Sort.Direction.DESC, "name");
+            case "newest", "date,desc", "recent", "created,desc" -> Sort.by(Sort.Direction.DESC, "createdAt");
+            default -> Sort.by(Sort.Direction.ASC, "id");
+        };
     }
 }
