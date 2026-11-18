@@ -24,6 +24,14 @@ public class OrderController {
         return orderService.createOrder(request);
     }
 
+    @GetMapping("/seguimiento")
+    public OrderDetailResponse getSeguimiento(
+            @RequestParam String codigo,
+            @RequestParam String telefono
+    ) {
+        return orderService.getSeguimiento(codigo, telefono);
+    }
+
     @GetMapping("/{id}")
     public OrderDetailResponse getById(@PathVariable Long id) {
         return orderService.getById(id);
