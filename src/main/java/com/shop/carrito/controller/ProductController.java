@@ -1,5 +1,7 @@
 package com.shop.carrito.controller;
 
+import com.shop.carrito.dto.CreateProductRequest;
+import com.shop.carrito.dto.ProductDto;
 import com.shop.carrito.dto.*;
 import com.shop.carrito.service.ProductService;
 import com.shop.carrito.service.ReviewService;
@@ -62,5 +64,11 @@ public class ProductController {
             @Valid @RequestBody CreateReviewRequest request
     ) {
         return reviewService.createReview(id, request);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductDto create(@Valid @RequestBody CreateProductRequest request) {
+        return productService.create(request);
     }
 }
