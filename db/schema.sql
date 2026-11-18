@@ -1,17 +1,55 @@
 CREATE DATABASE IF NOT EXISTS shop CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE shop;
 
--- 1. PRODUCTOS
-CREATE TABLE IF NOT EXISTS products (
-  id          BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  name        VARCHAR(120)  NOT NULL,
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS review_foto;
+DROP TABLE IF EXISTS producto_review;
+DROP TABLE IF EXISTS variante_atributo_valor;
+DROP TABLE IF EXISTS producto_variante;
+DROP TABLE IF EXISTS atributo_valor;
+DROP TABLE IF EXISTS atributo;
+DROP TABLE IF EXISTS producto_imagen;
+DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS categories;
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- Categorías
+CREATE TABLE categories (
+  id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+  name        VARCHAR(100)  NOT NULL,
+  slug        VARCHAR(120)  NOT NULL UNIQUE,
   description VARCHAR(500)  NULL,
-  price       DECIMAL(10,2) NOT NULL,
-  stock       INT UNSIGNED  NOT NULL DEFAULT 0,
   image_url   VARCHAR(255)  NULL,
   active      TINYINT(1)    NOT NULL DEFAULT 1,
   created_at  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Productos
+CREATE TABLE products (
+  id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+  name        VARCHAR(150)  NOT NULL,
+  slug        VARCHAR(150)  NOT NULL UNIQUE,
+  description VARCHAR(1000) NULL,
+  price       DECIMAL(10,2) NOT NULL,
+  stock       INT           NOT NULL DEFAULT 0,
+  image_url   VARCHAR(255)  NULL,
+  active      TINYINT(1)    NOT NULL DEFAULT 1,
+  category_id BIGINT        NULL,
+  created_at  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_products_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Galería de imágenes (producto_imagen)
+CREATE TABLE producto_imagen (
+  id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+  producto_id   BIGINT        NOT NULL,
+  image_url     VARCHAR(500)  NOT NULL,
+  is_cover      TINYINT(1)    NOT NULL DEFAULT 0,
+  display_order INT           NOT NULL DEFAULT 0,
+  CONSTRAINT fk_imagen_producto FOREIGN KEY (producto_id) REFERENCES products(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 2. UBIGEO DEL PERU (Distrito, Provincia, Departamento, Codigo 6 digitos)
 CREATE TABLE IF NOT EXISTS ubigeo (
