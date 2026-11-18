@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
@@ -25,5 +26,11 @@ public class GlobalExceptionHandler {
                 .map(err -> err.getDefaultMessage() != null ? err.getDefaultMessage() : err.getField() + " inválido")
                 .orElse("Datos inválidos");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", message));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Map<String, String>> handleMaxUpload(MaxUploadSizeExceededException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", "El archivo supera el límite máximo permitido (5 MB)"));
     }
 }
