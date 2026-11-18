@@ -1,26 +1,63 @@
 package com.shop.carrito.dto;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public record CreateOrderRequest(
-        @NotNull @Valid CustomerDto customer,
-        @NotEmpty @Valid List<OrderItemRequest> items
+        // Nuevo formato estructurado por secciones
+        ContactoDto contacto,
+        EntregaDto entrega,
+        ComprobanteDto comprobante,
+        PagoDto pago,
+
+        // Compatibilidad hacia atrás opcional
+        CustomerDto customer,
+
+        @NotEmpty(message = "El pedido debe contener al menos un producto")
+        @Valid
+        List<OrderItemRequest> items
 ) {
+    public record ContactoDto(
+            String nombre,
+            String telefono,
+            String email
+    ) {}
+
+    public record EntregaDto(
+            String tipo, // DOMICILIO, SHALOM, TIENDA
+            String ubigeoCodigo,
+            String direccion,
+            String referencia,
+            Long tiendaId,
+            Long agenciaId,
+            String receptorNombre,
+            String receptorDni
+    ) {}
+
+    public record ComprobanteDto(
+            String tipo, // BOLETA, FACTURA
+            String tipoDocumento, // DNI, CE, PASAPORTE, RUC
+            String numeroDocumento,
+            String razonSocial,
+            String direccionFiscal
+    ) {}
+
+    public record PagoDto(
+            String metodo // BCP, YAPE_PLIN, CULQI, FLOW
+    ) {}
+
+    // Formato simple de compatibilidad
     public record CustomerDto(
-            @NotBlank(message = "El nombre es obligatorio") String name,
-            @NotBlank(message = "El email es obligatorio") @Email(message = "Email inválido") String email,
+            String name,
+            String email,
             String phone,
-            @NotBlank(message = "La dirección es obligatoria") String address
+            String address
     ) {}
 
     public record OrderItemRequest(
             @NotNull(message = "productId es obligatorio") Long productId,
-            @NotNull @Min(value = 1, message = "La cantidad mínima es 1") Integer quantity
+            @NotNull Integer quantity
     ) {}
 }
