@@ -8,5 +8,11 @@ public record FilterOptionsResponse(
     List<String> tallas,
     List<String> colores,
     BigDecimal minPrice,
-    BigDecimal maxPrice
+    BigDecimal maxPrice,
+    List<FilterFacetDto> familias,
+    List<String> concentraciones,
+    List<String> ocasiones,
+    List<String> formatos,
+    List<FilterFacetDto> marcas,
+    List<String> generos
 ) {}

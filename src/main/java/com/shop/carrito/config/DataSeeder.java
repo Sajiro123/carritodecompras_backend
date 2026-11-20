@@ -21,292 +21,354 @@ public class DataSeeder {
             CategoryRepository categoryRepo,
             AttributeRepository attributeRepo,
             AttributeValueRepository attributeValueRepo,
-            ProductRepository productRepo,
-            ProductVariantRepository variantRepo
+            ProductRepository productRepo
     ) {
         return args -> {
             if (categoryRepo.count() > 0 && productRepo.count() > 0) {
                 return;
             }
 
-            // 1. Categorías
-            Category catRopa = categoryRepo.save(new Category("Ropa", "ropa", "Prendas de vestir urbanas y casuales", "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600"));
-            Category catCalzado = categoryRepo.save(new Category("Calzado", "calzado", "Zapatillas urbanas, deportivas y calzado cómodo", "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600"));
-            Category catAccesorios = categoryRepo.save(new Category("Accesorios", "accesorios", "Mochilas, gorras, billeteras y más", "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600"));
-            Category catTecno = categoryRepo.save(new Category("Tecnología", "tecnologia", "Dispositivos inteligentes y accesorios tech", "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600"));
-            Category catDeportes = categoryRepo.save(new Category("Deportes", "deportes", "Artículos para entrenamiento y vida activa", "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600"));
+            // 1. Categorías de Alta Perfumería
+            Category catNicho = categoryRepo.save(new Category(
+                    "Perfumería Nicho",
+                    "perfumeria-nicho",
+                    "Casas independientes de alta perfumería con materias primas excepcionales",
+                    "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&q=80"
+            ));
+            Category catHombre = categoryRepo.save(new Category(
+                    "Hombre",
+                    "hombre",
+                    "Composiciones masculinas amaderadas, especiadas y aromáticas",
+                    "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=600&q=80"
+            ));
+            Category catMujer = categoryRepo.save(new Category(
+                    "Mujer",
+                    "mujer",
+                    "Fragancias femeninas florales, orientales y gourmand de alta estela",
+                    "https://images.unsplash.com/photo-1541643600914-78b084683601?w=600&q=80"
+            ));
+            Category catOcasiones = categoryRepo.save(new Category(
+                    "Ocasiones Especiales",
+                    "ocasiones-especiales",
+                    "Extractos puros y eaux de parfum de magnetismo nocturno y gala",
+                    "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=600&q=80"
+            ));
+            Category catDecants = categoryRepo.save(new Category(
+                    "Decants & Sets",
+                    "decants-sets",
+                    "Decants oficiales certificados de 5ml, 10ml y Discovery Sets curados",
+                    "https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?w=600&q=80"
+            ));
 
-            // 2. Atributos
-            Attribute attrTalla = attributeRepo.save(new Attribute("Talla"));
-            Attribute attrColor = attributeRepo.save(new Attribute("Color"));
+            // 2. Atributos de Perfumería
+            Attribute attrPresentacion = attributeRepo.save(new Attribute("Presentación"));
+            Attribute attrConcentracion = attributeRepo.save(new Attribute("Concentración"));
 
-            // 3. Valores de Atributos
-            Map<String, AttributeValue> tallas = new HashMap<>();
-            for (String val : List.of("S", "M", "L", "XL", "39", "40", "41", "42", "Única")) {
-                tallas.put(val, attributeValueRepo.save(new AttributeValue(attrTalla, val)));
+            Map<String, AttributeValue> presentaciones = new HashMap<>();
+            for (String val : List.of("Frasco 125ml", "Frasco 100ml", "Frasco 90ml", "Frasco 75ml", "Frasco 70ml", "Frasco 60ml", "Decant 10ml", "Muestra 5ml", "Set 5 × 5ml")) {
+                presentaciones.put(val, attributeValueRepo.save(new AttributeValue(attrPresentacion, val)));
             }
 
-            Map<String, AttributeValue> colores = new HashMap<>();
-            for (String val : List.of("Negro", "Blanco", "Azul", "Rojo", "Gris", "Verde")) {
-                colores.put(val, attributeValueRepo.save(new AttributeValue(attrColor, val)));
+            Map<String, AttributeValue> concentraciones = new HashMap<>();
+            for (String val : List.of("EDP", "Extrait", "EDT", "Elixir")) {
+                concentraciones.put(val, attributeValueRepo.save(new AttributeValue(attrConcentracion, val)));
             }
 
-            // 4. Productos
+            // 3. Catálogo Curado de Alta Perfumería (14 fragancias)
 
-            // --- Producto 1: Polo Básico ---
-            Product p1 = new Product(
-                    "Polo Básico Algodón Pima",
-                    "polo-basico-algodon-pima",
-                    "Polo 100% algodón pima peruano, suave al tacto y corte clásico regular fit.",
-                    new BigDecimal("39.90"),
-                    45,
-                    "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800",
-                    catRopa
+            // 1. Parfums de Marly - Layton
+            Product p1 = buildPerfume(
+                    "Layton Eau de Parfum",
+                    "layton-eau-de-parfum",
+                    "Una obra maestra amaderada y oriental que abre con manzana verde crujiente, bergamota y lavanda, reposando sobre un corazón especiado de cardamomo y una base adictiva de vainilla Bourbon y sándalo.",
+                    "1090.00", "1250.00", "65.00", 14,
+                    "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=800&q=80",
+                    catOcasiones, "Parfums de Marly", "Amaderado", "EDP",
+                    "Noche & Gala, Citas Románticas", "125 ML EDP", "Frasco 100ml+",
+                    "Manzana crujiente, Vainilla Bourbon, Cardamomo, Sándalo",
+                    "BEST SELLER", "dark", "4.9", 154, "Hombre", true, true
             );
-            p1.addImage(new ProductImage(p1, "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800", true, 1));
-            p1.addImage(new ProductImage(p1, "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800", false, 2));
-            p1.addImage(new ProductImage(p1, "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=800", false, 3));
-
-            ProductVariant p1v1 = new ProductVariant(p1, "POLO-NEG-S", new BigDecimal("39.90"), 10);
-            p1v1.setAttributeValues(List.of(tallas.get("S"), colores.get("Negro")));
-            p1.addVariant(p1v1);
-
-            ProductVariant p1v2 = new ProductVariant(p1, "POLO-NEG-M", new BigDecimal("39.90"), 15);
-            p1v2.setAttributeValues(List.of(tallas.get("M"), colores.get("Negro")));
-            p1.addVariant(p1v2);
-
-            ProductVariant p1v3 = new ProductVariant(p1, "POLO-BLA-M", new BigDecimal("39.90"), 12);
-            p1v3.setAttributeValues(List.of(tallas.get("M"), colores.get("Blanco")));
-            p1.addVariant(p1v3);
-
-            ProductVariant p1v4 = new ProductVariant(p1, "POLO-AZU-L", new BigDecimal("39.90"), 8);
-            p1v4.setAttributeValues(List.of(tallas.get("L"), colores.get("Azul")));
-            p1.addVariant(p1v4);
-
-            ProductReview p1r1 = new ProductReview(p1, "Carlos M.", 5, "Excelente polo, el algodón se siente premium y la talla M queda exacta.");
-            p1r1.addPhoto(new ReviewPhoto(p1r1, "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=400"));
-            p1.addReview(p1r1);
-
-            ProductReview p1r2 = new ProductReview(p1, "Andrea Gomez", 4, "Buena tela y acabado. Muy cómodo para el uso diario.");
-            p1.addReview(p1r2);
-
+            p1.addImage(new ProductImage(p1, "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=800&q=80", true, 1));
+            p1.addImage(new ProductImage(p1, "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=800&q=80", false, 2));
+            addPerfumeVariants(p1, "PDM-LAY", "Frasco 125ml", "EDP", "1090.00", "115.00", "65.00", presentaciones, concentraciones);
+            p1.addReview(new ProductReview(p1, "Sebastián V.", 5, "Proyección increíble durante más de 10 horas. Llegó sellado con código de lote verificable en Lima."));
+            p1.addReview(new ProductReview(p1, "Diego R.", 5, "Probé primero la muestra de 5ml y terminé comprando el frasco de 125ml. Elegancia pura para noches de gala."));
             productRepo.save(p1);
 
-            // --- Producto 2: Zapatillas Urbanas ---
-            Product p2 = new Product(
-                    "Zapatillas Urbanas Street Pro",
-                    "zapatillas-urbanas-street-pro",
-                    "Zapatillas con suela antideslizante y amortiguación de impacto, ideales para la ciudad.",
-                    new BigDecimal("149.00"),
-                    28,
-                    "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800",
-                    catCalzado
+            // 2. Tom Ford - Tobacco Vanille
+            Product p2 = buildPerfume(
+                    "Tobacco Vanille Eau de Parfum",
+                    "tobacco-vanille-eau-de-parfum",
+                    "Opulento, cálido e icónico. Evoca los clubes privados londinenses con hoja de tabaco aromático, especias nobles, cacao cremoso, frutos secos y vainilla de Madagascar.",
+                    "1450.00", null, "85.00", 9,
+                    "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=800&q=80",
+                    catOcasiones, "Tom Ford", "Oriental / Especiado", "EDP",
+                    "Noche & Gala, Citas Románticas", "100 ML EDP", "Frasco 100ml+",
+                    "Hoja de tabaco especiado, Flor de tabaco, Vainilla, Cacao",
+                    "OCASIÓN NOCHE", "gold", "4.9", 138, "Unisex", true, true
             );
-            p2.addImage(new ProductImage(p2, "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800", true, 1));
-            p2.addImage(new ProductImage(p2, "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=800", false, 2));
-
-            ProductVariant p2v1 = new ProductVariant(p2, "ZAP-ROJ-40", new BigDecimal("149.00"), 8);
-            p2v1.setAttributeValues(List.of(tallas.get("40"), colores.get("Rojo")));
-            p2.addVariant(p2v1);
-
-            ProductVariant p2v2 = new ProductVariant(p2, "ZAP-ROJ-41", new BigDecimal("149.00"), 10);
-            p2v2.setAttributeValues(List.of(tallas.get("41"), colores.get("Rojo")));
-            p2.addVariant(p2v2);
-
-            ProductVariant p2v3 = new ProductVariant(p2, "ZAP-NEG-42", new BigDecimal("149.00"), 10);
-            p2v3.setAttributeValues(List.of(tallas.get("42"), colores.get("Negro")));
-            p2.addVariant(p2v3);
-
-            ProductReview p2r1 = new ProductReview(p2, "Juan Diego", 5, "Las zapatillas son súper cómodas y el diseño resalta bastante.");
-            p2r1.addPhoto(new ReviewPhoto(p2r1, "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400"));
-            p2.addReview(p2r1);
-
+            p2.addImage(new ProductImage(p2, "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=800&q=80", true, 1));
+            p2.addImage(new ProductImage(p2, "https://images.unsplash.com/photo-1587017539504-67cfbddac569?w=800&q=80", false, 2));
+            addPerfumeVariants(p2, "TF-TOBVAN", "Frasco 100ml", "EDP", "1450.00", "150.00", "85.00", presentaciones, concentraciones);
+            p2.addReview(new ProductReview(p2, "Valeria M.", 5, "Un clásico absoluto de invierno y noche. Dos atomizaciones bastan para destacar toda la velada."));
             productRepo.save(p2);
 
-            // --- Producto 3: Mochila 20L Impermeable ---
-            Product p3 = new Product(
-                    "Mochila Urbana Impermeable 20L",
-                    "mochila-urbana-impermeable-20l",
-                    "Compartimento para laptop de hasta 15.6 pulgadas, tejido impermeable y cierre antirrobo.",
-                    new BigDecimal("89.50"),
-                    22,
-                    "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800",
-                    catAccesorios
+            // 3. Dior - Sauvage Elixir
+            Product p3 = buildPerfume(
+                    "Sauvage Elixir",
+                    "sauvage-elixir",
+                    "Concentración extraordinaria comparable a un licor fino. Una estela embriagadora de canela, nuez moscada, esencia de lavanda hecha a medida y maderas licorosas.",
+                    "680.00", "800.00", "55.00", 22,
+                    "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=800&q=80",
+                    catHombre, "Dior", "Oriental / Especiado", "Elixir",
+                    "Noche & Gala, Club & Fiesta", "60 ML ELIXIR", "Frasco 50-90ml",
+                    "Canela, Nuez moscada, Lavanda fina, Sándalo y Regaliz",
+                    "-15% OFF", "red", "4.8", 210, "Hombre", false, true
             );
-            p3.addImage(new ProductImage(p3, "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800", true, 1));
-            p3.addImage(new ProductImage(p3, "https://images.unsplash.com/photo-1581605405669-fcdf81165afa?w=800", false, 2));
-
-            ProductVariant p3v1 = new ProductVariant(p3, "MOC-NEG-U", new BigDecimal("89.50"), 12);
-            p3v1.setAttributeValues(List.of(tallas.get("Única"), colores.get("Negro")));
-            p3.addVariant(p3v1);
-
-            ProductVariant p3v2 = new ProductVariant(p3, "MOC-AZU-U", new BigDecimal("89.50"), 10);
-            p3v2.setAttributeValues(List.of(tallas.get("Única"), colores.get("Azul")));
-            p3.addVariant(p3v2);
-
-            ProductReview p3r1 = new ProductReview(p3, "Lucia P.", 5, "La uso para ir a la universidad, entra mi laptop perfecta.");
-            p3.addReview(p3r1);
-
+            p3.addImage(new ProductImage(p3, "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=800&q=80", true, 1));
+            p3.addImage(new ProductImage(p3, "https://images.unsplash.com/photo-1563170351-be82bc888aa4?w=800&q=80", false, 2));
+            addPerfumeVariants(p3, "DIOR-ELIX", "Frasco 60ml", "Elixir", "680.00", "98.00", "55.00", presentaciones, concentraciones);
+            p3.addReview(new ProductReview(p3, "Martín C.", 5, "Duración bestial en piel y ropa. Entrega express en San Isidro en menos de 24 horas."));
             productRepo.save(p3);
 
-            // --- Producto 4: Gorra Deportiva ---
-            Product p4 = new Product(
-                    "Gorra Deportiva Dry-Fit",
-                    "gorra-deportiva-dry-fit",
-                    "Gorra transpirable con banda absorbente y visera curva con ajuste regulable.",
-                    new BigDecimal("29.00"),
-                    40,
-                    "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=800",
-                    catAccesorios
+            // 4. Nishane - Ani Extrait de Parfum
+            Product p4 = buildPerfume(
+                    "Ani Extrait de Parfum",
+                    "ani-extrait-de-parfum",
+                    "Extracto de perfume de la casa turca Nishane. Contrasta una salida chispeante de jengibre y bergamota con la vainilla más refinada, benjuí y maderas cremosas.",
+                    "980.00", null, "60.00", 11,
+                    "https://images.unsplash.com/photo-1587017539504-67cfbddac569?w=800&q=80",
+                    catNicho, "Nishane", "Gourmand", "Extrait",
+                    "Citas Románticas, Noche & Gala", "100 ML EXTRAIT", "Frasco 100ml+",
+                    "Jengibre picante, Bergamota, Vainilla turca, Cardamomo",
+                    "PERFUMERÍA NICHO", "soft", "4.9", 87, "Unisex", true, true
             );
-            p4.addImage(new ProductImage(p4, "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=800", true, 1));
-
-            ProductVariant p4v1 = new ProductVariant(p4, "GOR-NEG-U", new BigDecimal("29.00"), 20);
-            p4v1.setAttributeValues(List.of(tallas.get("Única"), colores.get("Negro")));
-            p4.addVariant(p4v1);
-
-            ProductVariant p4v2 = new ProductVariant(p4, "GOR-BLA-U", new BigDecimal("29.00"), 20);
-            p4v2.setAttributeValues(List.of(tallas.get("Única"), colores.get("Blanco")));
-            p4.addVariant(p4v2);
-
+            p4.addImage(new ProductImage(p4, "https://images.unsplash.com/photo-1587017539504-67cfbddac569?w=800&q=80", true, 1));
+            addPerfumeVariants(p4, "NISH-ANI", "Frasco 100ml", "Extrait", "980.00", "110.00", "60.00", presentaciones, concentraciones);
+            p4.addReview(new ProductReview(p4, "Camila F.", 5, "La mejor vainilla especiada que he probado. Totalmente unisex y con fijación eterna."));
             productRepo.save(p4);
 
-            // --- Producto 5: Smartwatch Deportivo ---
-            Product p5 = new Product(
-                    "Smartwatch Sport Fit 50m",
-                    "smartwatch-sport-fit-50m",
-                    "Monitor de frecuencia cardíaca, resistencia al agua 5 ATM y batería de 10 días de duración.",
-                    new BigDecimal("119.90"),
-                    15,
-                    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800",
-                    catTecno
+            // 5. Creed - Aventus Millésime
+            Product p5 = buildPerfume(
+                    "Aventus Millésime",
+                    "aventus-millesime",
+                    "El ícono mundial de la alta perfumería masculina. Combina piña jugosa, grosella negra y bergamota con un corazón ahumado de abedul seco, pachulí y auténtico ámbar gris.",
+                    "1390.00", null, "80.00", 8,
+                    "https://images.unsplash.com/photo-1563170351-be82bc888aa4?w=800&q=80",
+                    catNicho, "Creed", "Cítrico Fresco", "EDP",
+                    "Oficina / Firma, Noche & Gala, Verano & Fresco", "100 ML MILLÉSIME", "Frasco 100ml+",
+                    "Piña ahumada, Abedul seco, Grosella negra, Ámbar gris",
+                    "ÍCONO MUNDIAL", "dark", "5.0", 342, "Hombre", true, true
             );
-            p5.addImage(new ProductImage(p5, "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800", true, 1));
-            p5.addImage(new ProductImage(p5, "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=800", false, 2));
-
-            ProductVariant p5v1 = new ProductVariant(p5, "WAT-NEG-U", new BigDecimal("119.90"), 10);
-            p5v1.setAttributeValues(List.of(tallas.get("Única"), colores.get("Negro")));
-            p5.addVariant(p5v1);
-
-            ProductVariant p5v2 = new ProductVariant(p5, "WAT-GRI-U", new BigDecimal("119.90"), 5);
-            p5v2.setAttributeValues(List.of(tallas.get("Única"), colores.get("Gris")));
-            p5.addVariant(p5v2);
-
-            ProductReview p5r1 = new ProductReview(p5, "Renato S.", 5, "Gran relación calidad-precio. Las notificaciones llegan en tiempo real.");
-            p5r1.addPhoto(new ReviewPhoto(p5r1, "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400"));
-            p5.addReview(p5r1);
-
+            p5.addImage(new ProductImage(p5, "https://images.unsplash.com/photo-1563170351-be82bc888aa4?w=800&q=80", true, 1));
+            addPerfumeVariants(p5, "CRD-AVEN", "Frasco 100ml", "EDP", "1390.00", "145.00", "80.00", presentaciones, concentraciones);
+            p5.addReview(new ProductReview(p5, "Alejandro T.", 5, "Batch reciente con excelente balance frutal y ahumado. 100% original verificado."));
             productRepo.save(p5);
 
-            // --- Producto 6: Casaca Denim ---
-            Product p6 = new Product(
-                    "Casaca Denim Vintage Blue",
-                    "casaca-denim-vintage-blue",
-                    "Casaca de jean clásico prelavado con botones metálicos y bolsillos frontales.",
-                    new BigDecimal("179.00"),
-                    18,
-                    "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=800",
-                    catRopa
+            // 6. Xerjoff 1861 - Naxos
+            Product p6 = buildPerfume(
+                    "Naxos Eau de Parfum",
+                    "naxos-eau-de-parfum",
+                    "Tributo italiano al esplendor de Sicilia. Miel blanca artesanal fundida con lavanda fresca, hoja de tabaco dorado, canela y haba tonka envolvente.",
+                    "990.00", null, "62.00", 13,
+                    "https://images.unsplash.com/photo-1615634260167-c8cdede054de?w=800&q=80",
+                    catNicho, "Xerjoff 1861", "Gourmand", "EDP",
+                    "Noche & Gala, Citas Románticas", "100 ML EDP", "Frasco 100ml+",
+                    "Miel blanca pura, Hoja de tabaco, Lavanda siciliana, Tonka",
+                    "PERFUMERÍA NICHO", "soft", "4.9", 98, "Unisex", true, true
             );
-            p6.addImage(new ProductImage(p6, "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=800", true, 1));
-
-            ProductVariant p6v1 = new ProductVariant(p6, "CAS-AZU-M", new BigDecimal("179.00"), 8);
-            p6v1.setAttributeValues(List.of(tallas.get("M"), colores.get("Azul")));
-            p6.addVariant(p6v1);
-
-            ProductVariant p6v2 = new ProductVariant(p6, "CAS-AZU-L", new BigDecimal("179.00"), 10);
-            p6v2.setAttributeValues(List.of(tallas.get("L"), colores.get("Azul")));
-            p6.addVariant(p6v2);
-
+            p6.addImage(new ProductImage(p6, "https://images.unsplash.com/photo-1615634260167-c8cdede054de?w=800&q=80", true, 1));
+            addPerfumeVariants(p6, "XERJ-NAX", "Frasco 100ml", "EDP", "990.00", "112.00", "62.00", presentaciones, concentraciones);
+            p6.addReview(new ProductReview(p6, "Renato L.", 5, "Presentación impecable de Xerjoff y aroma hipnótico. Recibí cumplidos desde el primer día."));
             productRepo.save(p6);
 
-            // --- Producto 7: Audífonos Inalámbricos ---
-            Product p7 = new Product(
-                    "Audífonos Inalámbricos True Bass",
-                    "audifonos-inalambricos-true-bass",
-                    "Cancelación pasiva de ruido, Bluetooth 5.3 y estuche con carga rápida USB-C.",
-                    new BigDecimal("79.90"),
-                    35,
-                    "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=800",
-                    catTecno
+            // 7. Yves Saint Laurent - Bleu Électrique
+            Product p7 = buildPerfume(
+                    "Bleu Électrique",
+                    "bleu-electrique",
+                    "La interpretación más electrizante y sensual de La Nuit de L'Homme. Cardamomo vibrante y jengibre helado sobre una base cremosa de lavanda y cedro nocturno.",
+                    "490.00", "580.00", "38.00", 19,
+                    "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=800&q=80",
+                    catHombre, "Yves Saint Laurent", "Oriental / Especiado", "EDT",
+                    "Citas Románticas, Club & Fiesta", "100 ML EDT INTENSE", "Frasco 100ml+",
+                    "Cardamomo intenso, Jengibre helado, Lavanda, Cedro",
+                    "OFERTA ESPECIAL", "red", "4.8", 115, "Hombre", false, true
             );
-            p7.addImage(new ProductImage(p7, "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=800", true, 1));
-
-            ProductVariant p7v1 = new ProductVariant(p7, "AUD-NEG-U", new BigDecimal("79.90"), 20);
-            p7v1.setAttributeValues(List.of(tallas.get("Única"), colores.get("Negro")));
-            p7.addVariant(p7v1);
-
-            ProductVariant p7v2 = new ProductVariant(p7, "AUD-BLA-U", new BigDecimal("79.90"), 15);
-            p7v2.setAttributeValues(List.of(tallas.get("Única"), colores.get("Blanco")));
-            p7.addVariant(p7v2);
-
+            p7.addImage(new ProductImage(p7, "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=800&q=80", true, 1));
+            addPerfumeVariants(p7, "YSL-BLEU", "Frasco 100ml", "EDT", "490.00", "68.00", "38.00", presentaciones, concentraciones);
             productRepo.save(p7);
 
-            // --- Producto 8: Zapatillas Running Speed ---
-            Product p8 = new Product(
-                    "Zapatillas Running Speed Boost",
-                    "zapatillas-running-speed-boost",
-                    "Diseñadas para maratón y entrenamientos de alta intensidad con retorno de energía.",
-                    new BigDecimal("219.00"),
-                    14,
-                    "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=800",
-                    catCalzado
+            // 8. Initio Privés - Side Effect
+            Product p8 = buildPerfume(
+                    "Side Effect",
+                    "side-effect",
+                    "Magnetismo sin concesiones. Un acorde embriagador de ron añejo, tabaco oscuro, canela cálida y vainilla seductora con un fondo ligeramente ahumado y resinoso.",
+                    "1280.00", null, "75.00", 7,
+                    "https://images.unsplash.com/photo-1547887538-e3a2f32cb1cc?w=800&q=80",
+                    catOcasiones, "Initio Privés", "Cuero / Ahumado", "EDP",
+                    "Noche & Gala, Club & Fiesta, Citas Románticas", "90 ML EDP", "Frasco 50-90ml",
+                    "Ron añejo, Tabaco oscuro, Canela, Vainilla y Azafrán",
+                    "EXCLUSIVO", "dark", "4.9", 52, "Unisex", true, true
             );
-            p8.addImage(new ProductImage(p8, "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=800", true, 1));
-
-            ProductVariant p8v1 = new ProductVariant(p8, "RUN-NEG-41", new BigDecimal("219.00"), 6);
-            p8v1.setAttributeValues(List.of(tallas.get("41"), colores.get("Negro")));
-            p8.addVariant(p8v1);
-
-            ProductVariant p8v2 = new ProductVariant(p8, "RUN-AZU-42", new BigDecimal("219.00"), 8);
-            p8v2.setAttributeValues(List.of(tallas.get("42"), colores.get("Azul")));
-            p8.addVariant(p8v2);
-
+            p8.addImage(new ProductImage(p8, "https://images.unsplash.com/photo-1547887538-e3a2f32cb1cc?w=800&q=80", true, 1));
+            addPerfumeVariants(p8, "INIT-SIDE", "Frasco 90ml", "EDP", "1280.00", "138.00", "75.00", presentaciones, concentraciones);
             productRepo.save(p8);
 
-            // --- Producto 9: Pantalón Jogger Training ---
-            Product p9 = new Product(
-                    "Pantalón Jogger Training Slim",
-                    "pantalon-jogger-training-slim",
-                    "Tejido elástico de alta flexibilidad, bolsillos laterales con cremallera.",
-                    new BigDecimal("69.90"),
-                    26,
-                    "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=800",
-                    catDeportes
+            // 9. Maison Francis Kurkdjian - Baccarat Rouge 540 Extrait
+            Product p9 = buildPerfume(
+                    "Baccarat Rouge 540 Extrait",
+                    "baccarat-rouge-540-extrait",
+                    "Alquimia luminosa de alta perfumería parisina. Almendra amarga de Marruecos, azafrán precioso, jazmín Grandiflorum de Egipto y un halo cristalino de ámbar gris.",
+                    "1650.00", null, "95.00", 6,
+                    "https://images.unsplash.com/photo-1541643600914-78b084683601?w=800&q=80",
+                    catMujer, "Maison Francis Kurkdjian", "Oriental / Especiado", "Extrait",
+                    "Noche & Gala, Citas Románticas", "70 ML EXTRAIT", "Frasco 50-90ml",
+                    "Azafrán, Almendra amarga, Jazmín egipcio, Ámbar gris",
+                    "ÍCONO MUNDIAL", "dark", "5.0", 268, "Mujer", true, true
             );
-            p9.addImage(new ProductImage(p9, "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=800", true, 1));
-
-            ProductVariant p9v1 = new ProductVariant(p9, "JOG-NEG-M", new BigDecimal("69.90"), 12);
-            p9v1.setAttributeValues(List.of(tallas.get("M"), colores.get("Negro")));
-            p9.addVariant(p9v1);
-
-            ProductVariant p9v2 = new ProductVariant(p9, "JOG-GRI-L", new BigDecimal("69.90"), 14);
-            p9v2.setAttributeValues(List.of(tallas.get("L"), colores.get("Gris")));
-            p9.addVariant(p9v2);
-
+            p9.addImage(new ProductImage(p9, "https://images.unsplash.com/photo-1541643600914-78b084683601?w=800&q=80", true, 1));
+            addPerfumeVariants(p9, "MFK-BR540", "Frasco 70ml", "Extrait", "1650.00", "175.00", "95.00", presentaciones, concentraciones);
+            p9.addReview(new ProductReview(p9, "Lucía P.", 5, "Inconfundible y sublime. Llegó con empaque de boutique y muestra de cortesía."));
             productRepo.save(p9);
 
-            // --- Producto 10: Botella Térmica 1L ---
-            Product p10 = new Product(
-                    "Botella Térmica Inox 1L",
-                    "botella-termica-inox-1l",
-                    "Mantiene bebidas frías por 24 horas y calientes por 12 horas. Libre de BPA.",
-                    new BigDecimal("49.90"),
-                    30,
-                    "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=800",
-                    catDeportes
+            // 10. Parfums de Marly - Delina Exclusif
+            Product p10 = buildPerfume(
+                    "Delina Exclusif",
+                    "delina-exclusif",
+                    "Un bouquet majestuoso de rosa turca envuelto en lichi jugoso, pera aterciopelada, un velo misterioso de incienso y una estela cremosa de vainilla y almizcle.",
+                    "1180.00", "1320.00", "70.00", 10,
+                    "https://images.unsplash.com/photo-1595425970377-c9703cf48b6d?w=800&q=80",
+                    catMujer, "Parfums de Marly", "Floral", "EDP",
+                    "Citas Románticas, Noche & Gala", "75 ML EDP", "Frasco 50-90ml",
+                    "Rosa turca, Lichi, Pera, Incienso suave, Vainilla",
+                    "-10% OFF", "red", "4.9", 146, "Mujer", true, true
             );
-            p10.addImage(new ProductImage(p10, "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=800", true, 1));
-
-            ProductVariant p10v1 = new ProductVariant(p10, "BOT-NEG-U", new BigDecimal("49.90"), 15);
-            p10v1.setAttributeValues(List.of(tallas.get("Única"), colores.get("Negro")));
-            p10.addVariant(p10v1);
-
-            ProductVariant p10v2 = new ProductVariant(p10, "BOT-AZU-U", new BigDecimal("49.90"), 15);
-            p10v2.setAttributeValues(List.of(tallas.get("Única"), colores.get("Azul")));
-            p10.addVariant(p10v2);
-
+            p10.addImage(new ProductImage(p10, "https://images.unsplash.com/photo-1595425970377-c9703cf48b6d?w=800&q=80", true, 1));
+            addPerfumeVariants(p10, "PDM-DEL", "Frasco 75ml", "EDP", "1180.00", "125.00", "70.00", presentaciones, concentraciones);
             productRepo.save(p10);
+
+            // 11. Byredo - Bal d'Afrique
+            Product p11 = buildPerfume(
+                    "Bal d'Afrique Eau de Parfum",
+                    "bal-dafrique-eau-de-parfum",
+                    "Luminoso, sofisticado y vanguardista. Celebración cítrica y amaderada con bergamota brillante, limón de Amalfi, violeta africana, vetiver limpio y cedro de Marruecos.",
+                    "920.00", null, "58.00", 15,
+                    "https://images.unsplash.com/photo-1590736704728-f4730bb30770?w=800&q=80",
+                    catMujer, "Byredo", "Cítrico Fresco", "EDP",
+                    "Oficina / Firma, Verano & Fresco", "100 ML EDP", "Frasco 100ml+",
+                    "Bergamota, Limón de Amalfi, Vetiver, Violeta, Cedro",
+                    "PERFUMERÍA NICHO", "soft", "4.8", 74, "Mujer", true, true
+            );
+            p11.addImage(new ProductImage(p11, "https://images.unsplash.com/photo-1590736704728-f4730bb30770?w=800&q=80", true, 1));
+            addPerfumeVariants(p11, "BYR-BAL", "Frasco 100ml", "EDP", "920.00", "105.00", "58.00", presentaciones, concentraciones);
+            productRepo.save(p11);
+
+            // 12. Yves Saint Laurent - Libre Intense
+            Product p12 = buildPerfume(
+                    "Libre Intense Eau de Parfum",
+                    "libre-intense-eau-de-parfum",
+                    "Tensión ardiente entre la frescura de la lavanda francesa y la sensualidad de la flor de azahar de Marruecos, coronada con orquídea y vainilla cálida.",
+                    "540.00", "630.00", "42.00", 24,
+                    "https://images.unsplash.com/photo-1619994403073-2cec844b8e63?w=800&q=80",
+                    catMujer, "Yves Saint Laurent", "Floral", "EDP",
+                    "Citas Románticas, Oficina / Firma, Noche & Gala", "90 ML EDP", "Frasco 50-90ml",
+                    "Lavanda francesa, Flor de azahar, Orquídea, Vainilla",
+                    "-15% OFF", "red", "4.8", 183, "Mujer", false, true
+            );
+            p12.addImage(new ProductImage(p12, "https://images.unsplash.com/photo-1619994403073-2cec844b8e63?w=800&q=80", true, 1));
+            addPerfumeVariants(p12, "YSL-LIB", "Frasco 90ml", "EDP", "540.00", "76.00", "42.00", presentaciones, concentraciones);
+            productRepo.save(p12);
+
+            // 13. Discovery Set Alta Perfumería (5 x 5ml)
+            Product p13 = buildPerfume(
+                    "Discovery Set Nicho — Gala & Noche (5 × 5ml)",
+                    "discovery-set-nicho-gala-noche",
+                    "Estuche de degustación oficial con 5 atomizadores de vidrio de 5ml envasados al momento: Layton, Tobacco Vanille, Naxos, Ani Extrait y Side Effect.",
+                    "240.00", "295.00", "55.00", 30,
+                    "https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?w=800&q=80",
+                    catDecants, "Tom Ford", "Amaderado", "Extrait",
+                    "Noche & Gala, Citas Románticas, Oficina / Firma", "SET 5 × 5 ML", "Discovery Set",
+                    "5 Decants certificados 5ml · Estuche rígido con guía olfativa",
+                    "SET CURADO", "gold", "5.0", 92, "Unisex", true, true
+            );
+            p13.addImage(new ProductImage(p13, "https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?w=800&q=80", true, 1));
+            ProductVariant p13v1 = new ProductVariant(p13, "SET-GALA-5X5", new BigDecimal("240.00"), 30);
+            p13v1.setAttributeValues(List.of(presentaciones.get("Set 5 × 5ml"), concentraciones.get("Extrait")));
+            p13.addVariant(p13v1);
+            productRepo.save(p13);
+
+            // 14. Decant Oficial Tom Ford Oud Wood 10ml
+            Product p14 = buildPerfume(
+                    "Oud Wood — Decant Oficial 10ml",
+                    "oud-wood-decant-oficial-10ml",
+                    "Atomizador de viaje de 10ml extraído de frasco original verificado. Madera de oud exótica suavizada con palo de rosa, cardamomo, sándalo y vetiver.",
+                    "165.00", null, "85.00", 35,
+                    "https://images.unsplash.com/photo-1608528577891-eb055944f2e7?w=800&q=80",
+                    catDecants, "Tom Ford", "Amaderado", "EDP",
+                    "Oficina / Firma, Noche & Gala", "10 ML DECANT", "Decant 5ml / 10ml",
+                    "Madera de oud rara, Palo de rosa, Cardamomo, Sándalo",
+                    "DECANT OFICIAL", "soft", "4.9", 64, "Unisex", true, true
+            );
+            p14.addImage(new ProductImage(p14, "https://images.unsplash.com/photo-1608528577891-eb055944f2e7?w=800&q=80", true, 1));
+            ProductVariant p14v1 = new ProductVariant(p14, "TF-OUD-10ML", new BigDecimal("165.00"), 20);
+            p14v1.setAttributeValues(List.of(presentaciones.get("Decant 10ml"), concentraciones.get("EDP")));
+            p14.addVariant(p14v1);
+            ProductVariant p14v2 = new ProductVariant(p14, "TF-OUD-5ML", new BigDecimal("85.00"), 15);
+            p14v2.setAttributeValues(List.of(presentaciones.get("Muestra 5ml"), concentraciones.get("EDP")));
+            p14.addVariant(p14v2);
+            productRepo.save(p14);
         };
+    }
+
+    private Product buildPerfume(
+            String name, String slug, String description,
+            String price, String originalPrice, String samplePrice, int stock,
+            String imageUrl, Category category, String brand,
+            String olfactoryFamily, String concentration, String occasion,
+            String volumeLabel, String formatType, String notes,
+            String badge, String badgeTone, String rating, int reviewsCount,
+            String gender, boolean isNiche, boolean fastDeliveryLima
+    ) {
+        Product p = new Product(name, slug, description, new BigDecimal(price), stock, imageUrl, category);
+        p.setBrand(brand);
+        p.setOlfactoryFamily(olfactoryFamily);
+        p.setConcentration(concentration);
+        p.setOccasion(occasion);
+        p.setVolumeLabel(volumeLabel);
+        p.setFormatType(formatType);
+        p.setNotes(notes);
+        p.setBadge(badge);
+        p.setBadgeTone(badgeTone);
+        if (originalPrice != null) {
+            p.setOriginalPrice(new BigDecimal(originalPrice));
+        }
+        p.setSamplePrice(new BigDecimal(samplePrice));
+        p.setRating(new BigDecimal(rating));
+        p.setReviewsCount(reviewsCount);
+        p.setGender(gender);
+        p.setIsNiche(isNiche);
+        p.setFastDeliveryLima(fastDeliveryLima);
+        return p;
+    }
+
+    private void addPerfumeVariants(
+            Product product, String skuPrefix, String bottleLabel, String concLabel,
+            String bottlePrice, String decant10Price, String sample5Price,
+            Map<String, AttributeValue> presentaciones,
+            Map<String, AttributeValue> concentraciones
+    ) {
+        AttributeValue concVal = concentraciones.get(concLabel);
+
+        ProductVariant vBottle = new ProductVariant(product, skuPrefix + "-FULL", new BigDecimal(bottlePrice), product.getStock());
+        vBottle.setAttributeValues(List.of(presentaciones.get(bottleLabel), concVal));
+        product.addVariant(vBottle);
+
+        ProductVariant v10 = new ProductVariant(product, skuPrefix + "-10ML", new BigDecimal(decant10Price), 25);
+        v10.setAttributeValues(List.of(presentaciones.get("Decant 10ml"), concVal));
+        product.addVariant(v10);
+
+        ProductVariant v5 = new ProductVariant(product, skuPrefix + "-5ML", new BigDecimal(sample5Price), 40);
+        v5.setAttributeValues(List.of(presentaciones.get("Muestra 5ml"), concVal));
+        product.addVariant(v5);
     }
 }

@@ -34,4 +34,22 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
     @Query("SELECT MAX(p.price) FROM Product p WHERE p.active = true")
     BigDecimal findMaxPrice();
+
+    @Query("SELECT p.olfactoryFamily, COUNT(p) FROM Product p WHERE p.active = true AND p.olfactoryFamily IS NOT NULL GROUP BY p.olfactoryFamily ORDER BY COUNT(p) DESC, p.olfactoryFamily ASC")
+    List<Object[]> countByOlfactoryFamily();
+
+    @Query("SELECT p.brand, COUNT(p) FROM Product p WHERE p.active = true AND p.brand IS NOT NULL GROUP BY p.brand ORDER BY COUNT(p) DESC, p.brand ASC")
+    List<Object[]> countByBrand();
+
+    @Query("SELECT DISTINCT p.concentration FROM Product p WHERE p.active = true AND p.concentration IS NOT NULL ORDER BY p.concentration ASC")
+    List<String> findDistinctConcentrations();
+
+    @Query("SELECT DISTINCT p.formatType FROM Product p WHERE p.active = true AND p.formatType IS NOT NULL ORDER BY p.formatType ASC")
+    List<String> findDistinctFormatTypes();
+
+    @Query("SELECT DISTINCT p.gender FROM Product p WHERE p.active = true AND p.gender IS NOT NULL ORDER BY p.gender ASC")
+    List<String> findDistinctGenders();
+
+    @Query("SELECT p.occasion FROM Product p WHERE p.active = true AND p.occasion IS NOT NULL")
+    List<String> findAllOccasionStrings();
 }

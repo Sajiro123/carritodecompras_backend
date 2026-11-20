@@ -17,8 +17,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.text.Normalizer;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -47,6 +49,15 @@ public class ProductService {
             BigDecimal maxPrecio,
             Boolean disponible,
             String q,
+            String marca,
+            String familia,
+            String concentracion,
+            String ocasion,
+            String formato,
+            String genero,
+            Boolean nicho,
+            Boolean soloDescuento,
+            Boolean entrega24h,
             String sort,
             Integer page,
             Integer size
@@ -58,7 +69,8 @@ public class ProductService {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sortObj);
 
         Specification<Product> spec = ProductSpecification.filter(
-                categoria, talla, color, minPrecio, maxPrecio, disponible, q
+                categoria, talla, color, minPrecio, maxPrecio, disponible, q,
+                marca, familia, concentracion, ocasion, formato, genero, nicho, soloDescuento, entrega24h
         );
 
         Page<ProductDto> productPage = productRepository.findAll(spec, pageable).map(ProductDto::from);
@@ -68,17 +80,54 @@ public class ProductService {
     @Transactional(readOnly = true)
     public FilterOptionsResponse getFilterOptions() {
         var categories = categoryService.getCategoriesWithActiveProductCount();
-        var tallas = attributeValueRepository.findDistinctValuesByAttributeName("talla");
-        var colores = attributeValueRepository.findDistinctValuesByAttributeName("color");
+        var tallas = attributeValueRepository.findDistinctValuesByAttributeName("presentación");
+        var colores = attributeValueRepository.findDistinctValuesByAttributeName("concentración");
         BigDecimal minPrice = productRepository.findMinPrice();
         BigDecimal maxPrice = productRepository.findMaxPrice();
+
+        List<FilterFacetDto> familias = productRepository.countByOlfactoryFamily().stream()
+                .map(row -> new FilterFacetDto((String) row[0], ((Number) row[1]).longValue()))
+                .toList();
+
+        List<FilterFacetDto> marcas = productRepository.countByBrand().stream()
+                .map(row -> new FilterFacetDto((String) row[0], ((Number) row[1]).longValue()))
+                .toList();
+
+        List<String> concentraciones = productRepository.findDistinctConcentrations();
+        if (concentraciones.isEmpty()) {
+            concentraciones = List.of("EDP", "Extrait", "EDT", "Elixir");
+        }
+
+        List<String> formatos = productRepository.findDistinctFormatTypes();
+        List<String> generos = productRepository.findDistinctGenders();
+
+        Set<String> occasionSet = new LinkedHashSet<>();
+        for (String occRaw : productRepository.findAllOccasionStrings()) {
+            if (occRaw != null) {
+                for (String token : occRaw.split(",")) {
+                    String clean = token.trim();
+                    if (!clean.isEmpty()) {
+                        occasionSet.add(clean);
+                    }
+                }
+            }
+        }
+        List<String> ocasiones = occasionSet.isEmpty()
+                ? List.of("Citas Románticas", "Noche & Gala", "Oficina / Firma", "Club & Fiesta", "Verano & Fresco")
+                : List.copyOf(occasionSet);
 
         return new FilterOptionsResponse(
                 categories,
                 tallas,
                 colores,
                 minPrice != null ? minPrice : BigDecimal.ZERO,
-                maxPrice != null ? maxPrice : BigDecimal.valueOf(500)
+                maxPrice != null ? maxPrice : BigDecimal.valueOf(1800),
+                familias,
+                concentraciones,
+                ocasiones,
+                formatos,
+                marcas,
+                generos
         );
     }
 
@@ -109,19 +158,16 @@ public class ProductService {
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado"));
         }
 
-        // Galería (producto_imagen)
         var galeria = (product.getImages() != null ? product.getImages() : List.<com.shop.carrito.entity.ProductImage>of())
                 .stream()
                 .map(ProductImageDto::from)
                 .toList();
 
-        // Variantes con stock y atributos (producto_variante + atributo_valor)
         var variantes = (product.getVariants() != null ? product.getVariants() : List.<com.shop.carrito.entity.ProductVariant>of())
                 .stream()
                 .map(ProductVariantDto::from)
                 .toList();
 
-        // Productos relacionados (de la misma categoría o catálogo general)
         List<ProductDto> relacionados = List.of();
         if (product.getCategory() != null) {
             relacionados = productRepository.findTop4ByCategoryAndActiveTrueAndIdNot(product.getCategory(), product.getId())
@@ -146,11 +192,27 @@ public class ProductService {
                 product.getSlug(),
                 product.getDescription(),
                 product.getPrice(),
+                product.getOriginalPrice(),
+                product.getSamplePrice(),
                 product.getStock(),
                 product.getImageUrl(),
                 catId,
                 catName,
                 catSlug,
+                product.getBrand(),
+                product.getOlfactoryFamily(),
+                product.getConcentration(),
+                product.getOccasion(),
+                product.getVolumeLabel(),
+                product.getFormatType(),
+                product.getNotes(),
+                product.getBadge(),
+                product.getBadgeTone(),
+                product.getRating(),
+                product.getReviewsCount(),
+                product.getGender(),
+                product.getIsNiche(),
+                product.getFastDeliveryLima(),
                 galeria,
                 variantes,
                 relacionados
@@ -173,6 +235,12 @@ public class ProductService {
                 request.imageUrl().trim(),
                 null
         );
+        product.setBrand("AROMA ATELIER");
+        product.setConcentration("EDP");
+        product.setVolumeLabel("100 ML EDP");
+        product.setFormatType("Frasco 100ml+");
+        product.setGender("Unisex");
+        product.setFastDeliveryLima(true);
         return ProductDto.from(productRepository.save(product));
     }
 
@@ -183,7 +251,7 @@ public class ProductService {
                 .replaceAll("[^a-z0-9]+", "-")
                 .replaceAll("^-+|-+$", "");
         if (base.isBlank()) {
-            base = "producto";
+            base = "fragancia";
         }
         if (base.length() > 130) {
             base = base.substring(0, 130);
@@ -195,8 +263,8 @@ public class ProductService {
     }
 
     private Sort parseSort(String sort) {
-        if (sort == null || sort.isBlank()) {
-            return Sort.by(Sort.Direction.ASC, "id");
+        if (sort == null || sort.isBlank() || "bestsellers".equalsIgnoreCase(sort.trim())) {
+            return Sort.by(Sort.Order.desc("reviewsCount"), Sort.Order.asc("id"));
         }
         String s = sort.trim().toLowerCase();
         return switch (s) {
@@ -204,8 +272,9 @@ public class ProductService {
             case "price,desc", "precio_desc", "price-desc", "desc" -> Sort.by(Sort.Direction.DESC, "price");
             case "name,asc", "nombre_asc", "name-asc" -> Sort.by(Sort.Direction.ASC, "name");
             case "name,desc", "nombre_desc", "name-desc" -> Sort.by(Sort.Direction.DESC, "name");
+            case "rating,desc", "rating" -> Sort.by(Sort.Order.desc("rating"), Sort.Order.desc("reviewsCount"));
             case "newest", "date,desc", "recent", "created,desc" -> Sort.by(Sort.Direction.DESC, "createdAt");
-            default -> Sort.by(Sort.Direction.ASC, "id");
+            default -> Sort.by(Sort.Order.desc("reviewsCount"), Sort.Order.asc("id"));
         };
     }
 }

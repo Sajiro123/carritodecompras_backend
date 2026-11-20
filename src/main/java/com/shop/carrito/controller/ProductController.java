@@ -1,7 +1,5 @@
 package com.shop.carrito.controller;
 
-import com.shop.carrito.dto.CreateProductRequest;
-import com.shop.carrito.dto.ProductDto;
 import com.shop.carrito.dto.*;
 import com.shop.carrito.service.ProductService;
 import com.shop.carrito.service.ReviewService;
@@ -33,12 +31,23 @@ public class ProductController {
             @RequestParam(required = false) BigDecimal maxPrecio,
             @RequestParam(required = false) Boolean disponible,
             @RequestParam(required = false) String q,
+            @RequestParam(required = false) String marca,
+            @RequestParam(required = false) String familia,
+            @RequestParam(required = false) String concentracion,
+            @RequestParam(required = false) String ocasion,
+            @RequestParam(required = false) String formato,
+            @RequestParam(required = false) String genero,
+            @RequestParam(required = false) Boolean nicho,
+            @RequestParam(required = false) Boolean soloDescuento,
+            @RequestParam(required = false) Boolean entrega24h,
             @RequestParam(required = false) String sort,
             @RequestParam(required = false, defaultValue = "0") Integer page,
             @RequestParam(required = false, defaultValue = "12") Integer size
     ) {
         return productService.getProducts(
-                categoria, talla, color, minPrecio, maxPrecio, disponible, q, sort, page, size
+                categoria, talla, color, minPrecio, maxPrecio, disponible, q,
+                marca, familia, concentracion, ocasion, formato, genero, nicho, soloDescuento, entrega24h,
+                sort, page, size
         );
     }
 

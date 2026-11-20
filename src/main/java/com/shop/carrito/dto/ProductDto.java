@@ -9,11 +9,27 @@ public record ProductDto(
     String slug,
     String description,
     BigDecimal price,
+    BigDecimal originalPrice,
+    BigDecimal samplePrice,
     Integer stock,
     String imageUrl,
     Long categoryId,
     String categoryName,
-    String categorySlug
+    String categorySlug,
+    String brand,
+    String olfactoryFamily,
+    String concentration,
+    String occasion,
+    String volumeLabel,
+    String formatType,
+    String notes,
+    String badge,
+    String badgeTone,
+    BigDecimal rating,
+    Integer reviewsCount,
+    String gender,
+    Boolean isNiche,
+    Boolean fastDeliveryLima
 ) {
     public static ProductDto from(Product p) {
         String catName = p.getCategory() != null ? p.getCategory().getName() : null;
@@ -25,11 +41,27 @@ public record ProductDto(
             p.getSlug(),
             p.getDescription(),
             p.getPrice(),
+            p.getOriginalPrice(),
+            p.getSamplePrice(),
             p.getStock(),
             p.getImageUrl(),
             catId,
             catName,
-            catSlug
+            catSlug,
+            p.getBrand(),
+            p.getOlfactoryFamily(),
+            p.getConcentration(),
+            p.getOccasion(),
+            p.getVolumeLabel(),
+            p.getFormatType(),
+            p.getNotes(),
+            p.getBadge(),
+            p.getBadgeTone(),
+            p.getRating(),
+            p.getReviewsCount(),
+            p.getGender(),
+            p.getIsNiche(),
+            p.getFastDeliveryLima()
         );
     }
 }
